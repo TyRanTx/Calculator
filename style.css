@@ -1,0 +1,45 @@
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#calc-container{
+height: 560px;
+width: 400px;
+border: 1px solid black;
+}
+
+.display{
+    height: 80px;
+    width: 380px;
+    border: 1px solid black;
+
+    margin: auto;
+    margin-top: 30px;
+    
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+
+.buttons-container{
+    border: 1px solid black;
+    height: 382px;
+    width: 380px;
+    margin: auto;
+    margin-top: 50px;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 10px;
+    
+}
+
+.buttons-container button{
+    width: 87.5px;
+    height: 88px;
+    
+    
+}
