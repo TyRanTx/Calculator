@@ -1,10 +1,24 @@
+const digits = document.querySelectorAll('.buttons-container > .operand');
+const arithmetic = document.querySelectorAll('.buttons-container > .arithmetic');
+const result = document.querySelector('.buttons-container > #result');
+const allclear = document.querySelector('.buttons-container > #allclear');
+const display = document.querySelector('.display');
+const decimal = document.querySelector('.buttons-container > #decimal');
+const del = document.querySelector('.buttons-container > #delete');
+
+digits.forEach(digit => digit.addEventListener('click', inputDigit));
+arithmetic.forEach(arith => arith.addEventListener('click', inputArithmetic));
+result.addEventListener('click', showResult);
+allclear.addEventListener('click', delAll);
+decimal.addEventListener('click', inputDecimal);
+del.addEventListener('click', deleteInteger);
+
 let operandA = '';
 let operator = null;
 let operandB = '';
-let equal = false;
-
-let bool = true;
-
+let equalAllowed = false;
+let operatorAllowed = true;
+let side = 'left';
 
 function add(a, b) {
     return a + b;
@@ -27,63 +41,100 @@ function modulo(a, b) {
 }
 
 function operate(a, operator, b) {
-    return (operator === "+") ? add(a, b) :
-        (operator === "-") ? subtract(a, b) :
-            (operator === "*") ? multiply(a, b) :
-                (operator === "/") ? divide(a, b) :
-                (operator === "%") ? modulo(a, b) :
-                    null;
+    return (operator === "+") ? add(+a, +b) :
+        (operator === "-") ? subtract(+a, +b) :
+            (operator === "*") ? multiply(+a, +b) :
+                (operator === "/") ? divide(+a, +b) :
+                    (operator === "%") ? modulo(+a, +b) :
+                        null;
 }
 
-const digits = document.querySelectorAll('.buttons-container > .operand');
-const arithmetic = document.querySelectorAll('.buttons-container > .arithmetic');
-const result = document.querySelector('.buttons-container > #result');
-const ac = document.querySelector('.buttons-container > #ac');
-const display = document.querySelector('.display');
-
-function delAll(){
+function delAll() {
+    display.textContent = '';
     operandA = '';
     operator = null;
     operandB = '';
-    display.textContent = '';
+    side = 'left';
 }
 
-digits.forEach(digit => digit.addEventListener('click', () => {
-    bool = true;
-    display.textContent += digit.textContent;
-
-    if (operator === null) {
-        operandA += digit.textContent;
+function inputDecimal() {
+    if (side === 'left') {
+        if (!operandA.includes('.')) {
+            display.textContent += '.';
+            operandA += '.';
+        }
     }
-    else {
-        operandB += digit.textContent;
-        equal = true;
-    }
-}));
 
-arithmetic.forEach(arith => arith.addEventListener('click', () => {
-    if (bool === true) {
+    if (side === 'right') {
+        if (!operandB.includes('.')) {
+            display.textContent += '.';
+            operandB += '.';
+        }
+    }
+}
+
+function deleteInteger() {
+    if (side === 'left') {
+        if (operandA !== '') {
+            let delLastChar = operandA.slice(0, -1);
+            operandA = delLastChar;
+            let delLastCharFromDisplay = display.textContent.slice(0, -1);
+            display.textContent = delLastCharFromDisplay;
+        }
+    }
+
+    if (side === 'right') {
         if (operandB !== '') {
-            let op = operate(Number(operandA), operator, Number(operandB));
-            display.textContent = `${op} ${arith.textContent}`;
-            operandA = op;
-            operator = arith.textContent;
+            let delLastChar = operandB.slice(0, -1);
+            operandB = delLastChar;
+            let delLastCharFromDisplay = display.textContent.slice(0, -1);
+            display.textContent = delLastCharFromDisplay;
+        }
+    }
+}
+
+function showResult() {
+    if (equalAllowed === true) {
+        let result = operate(operandA, operator, operandB);
+        display.textContent = result;
+        operandA = result.toString();
+        operandB = '';
+        operator = null;
+        side = 'left';
+    }
+    equalAllowed = false;
+}
+
+function inputArithmetic() {
+    if (operatorAllowed === true) {
+
+        if (side === 'left') {
+            display.textContent += this.textContent;
+            operator = this.textContent;
+            side = 'right';
+        }
+
+        else {
+            let op = operate(operandA, operator, operandB);
+            display.textContent = `${op} ${this.textContent}`;
+            operandA = op.toString();
+            operator = this.textContent;
             operandB = '';
         }
-        else if(operandA !== ''){
-            display.textContent += arith.textContent;
-            operator = arith.textContent;
-        }
     }
-    bool = false;
-}));
+    operatorAllowed = false;
+}
 
+function inputDigit() {
+    display.textContent += this.textContent;
+    operatorAllowed = true;
 
-result.addEventListener('click', () => {
-    if(equal === true){
-    display.textContent = operate(Number(operandA), operator, Number(operandB));
+    if (side === 'left') {
+        operandA += this.textContent;
     }
-    equal = false;
-})
 
-ac.addEventListener('click', delAll);
+    else {
+        operandB += this.textContent;
+        equalAllowed = true;
+    }
+}
